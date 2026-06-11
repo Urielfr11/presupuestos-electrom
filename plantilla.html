@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+    body { margin: 0; padding: 20px; background-color: #f0f2f6; font-family: Arial, sans-serif; }
+    #tarjeta-presupuesto {
+        width: 440px; background: #fcfbf9; padding: 25px; border-radius: 16px; 
+        border: 1px solid #dfcbb5; border-top: 15px solid #dfcbb5; margin: auto;
+    }
+    .btn-descargar {
+        background-color: #27ae60; color: white; border: none; padding: 14px 20px; 
+        font-size: 15px; font-weight: bold; border-radius: 10px; cursor: pointer; 
+        width: 100%; max-width: 440px; margin: 15px auto 20px auto; display: block;
+        box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2);
+    }
+</style>
+</head>
+<body>
+
+<div id="tarjeta-presupuesto">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dfcbb5; padding-bottom: 15px; margin-bottom: 15px;">
+        <div style="width: 125px;">__LOGO__</div>
+        <div style="width: 250px; text-align: right; font-size: 10px; color: #333;">
+            <b>🔌 INSTALACIONES Y REPARACIONES</b><br>
+            <b>📄 CERTIFICACIONES TÉCNICAS</b><br>
+            <b>📞 Tel. 343 4722423</b><br>
+            Paraná - Entre Ríos
+        </div>
+    </div>
+
+    <h1 style="text-align: center; color: #000; font-size: 26px; margin: 15px 0; text-transform: uppercase; 
+        text-shadow: 1px 1px 0 #FFD700, -1px -1px 0 #FFD700, 1px -1px 0 #FFD700, -1px 1px 0 #FFD700;">
+        PRESUPUESTO
+    </h1>
+
+    <div style="font-size: 12px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+        <p style="margin: 3px 0;">👤 <b>CLIENTE:</b> __CLIENTE__</p>
+        <p style="margin: 3px 0;">📍 <b>DIRECCIÓN:</b> __DIRECCION__</p>
+        <p style="margin: 3px 0;">📅 <b>FECHA:</b> __FECHA__</p>
+    </div>
+
+    <div style="background: #FFF7CC; padding: 8px; font-size: 11px; font-weight: bold; display: flex; border-radius: 6px; margin-bottom: 5px;">
+        <span style="flex: 2;">LISTA DE CONCEPTOS</span>
+        <span style="flex: 0.5; text-align: center;">CANT.</span>
+        <span style="flex: 1; text-align: right;">SUBTOTAL</span>
+    </div>
+    
+    <div style="margin: 10px 0;">__TABLA__</div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; background: #FFD700; padding: 10px; border-radius: 8px; font-weight: bold;">
+        <span>MONTO NETO</span><span>__TOTAL__</span>
+    </div>
+
+    <div style="margin-top: 15px; font-size: 12px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <p style="margin: 0 0 5px 0; font-weight: bold;">Detalle del Proyecto:</p>
+        __DETALLE__
+    </div>
+</div>
+
+<button class="btn-descargar" onclick="descargarComoImagen()">📲 GUARDAR PRESUPUESTO EN EL CELU</button>
+
+<script>
+function descargarComoImagen() {
+    html2canvas(document.getElementById('tarjeta-presupuesto'), {scale: 3}).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Presupuesto_ElectroM.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
+</script>
+</body>
+</html>
