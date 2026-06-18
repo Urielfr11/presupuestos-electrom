@@ -12,15 +12,16 @@ st.title("⚡ Electro M - Creador")
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    cliente = st.text_input("Nombre del Cliente", "Eliana - Ariel")
-    dir = st.text_input("Dirección", "Pedro de Mendoza 2254, Paraná")
+    # Campos totalmente vacíos para rellenar de cero
+    cliente = st.text_input("Nombre del Cliente", "")
+    dir = st.text_input("Dirección", "")
     fecha = st.date_input("Fecha").strftime("%d/%m/%Y")
-    detalle = st.text_area("Observaciones", "Instalación de bocas, cableado y armado de tableros.")
+    detalle = st.text_area("Observaciones", "")
     
     st.write("---")
     d = st.text_input("Servicio")
     c = st.number_input("Cantidad", 1)
-    p = st.number_input("Precio Unitario ($)", 0.0)
+    p = st.number_input("Precio Unitario ($)", 0) # Cambiado a entero para arrancar limpio
     
     if st.button("➕ Agregar a Servicios"):
         st.session_state.lista.append({"d": d, "c": c, "p": p, "s": c*p})
@@ -30,7 +31,6 @@ with col1:
     if len(st.session_state.lista) == 0:
         st.write("*No hay servicios cargados aún.*")
     else:
-        # Mostrar cada ítem con un botón individual para borrarlo
         for index, item in enumerate(st.session_state.lista):
             col_item, col_btn = st.columns([0.85, 0.15])
             with col_item:
@@ -45,7 +45,7 @@ with col1:
         st.session_state.lista = []
         st.rerun()
 
-# Generar filas fluidas con las 4 columnas (Servicio, Cant, P. Unit, Subtotal)
+# Generar filas fluidas
 filas = "".join([
     f'''<div style="display:flex; padding:8px 0; border-bottom:1px solid #eee; font-size: 11px; align-items: center;">
         <span style="flex: 1.8; word-break: break-word;">{i["d"]}</span>
