@@ -23,18 +23,35 @@ with col1:
     p = st.number_input("Precio Unitario ($)", 0.0)
     
     if st.button("➕ Agregar a Servicios"):
-        st.session_state.lista.append({"d": d, "c": c, "s": c*p})
+        st.session_state.lista.append({"d": d, "c": c, "p": p, "s": c*p})
         st.rerun()
         
+    st.write("### 🛠️ Lista de Servicios Cargados")
+    if len(st.session_state.lista) == 0:
+        st.write("*No hay servicios cargados aún.*")
+    else:
+        # Mostrar cada ítem con un botón individual para borrarlo
+        for index, item in enumerate(st.session_state.lista):
+            col_item, col_btn = st.columns([0.85, 0.15])
+            with col_item:
+                st.write(f"**{item['d']}** ({item['c']} x ${item['p']:,.0f}) = ${item['s']:,.0f}")
+            with col_btn:
+                if st.button("❌", key=f"borrar_{index}"):
+                    st.session_state.lista.pop(index)
+                    st.rerun()
+
+    st.write("---")
     if st.button("🗑️ Borrar toda la lista"):
         st.session_state.lista = []
         st.rerun()
 
+# Generar filas fluidas con las 4 columnas (Servicio, Cant, P. Unit, Subtotal)
 filas = "".join([
     f'''<div style="display:flex; padding:8px 0; border-bottom:1px solid #eee; font-size: 11px; align-items: center;">
-        <span style="flex: 2; word-break: break-word;">{i["d"]}</span>
-        <span style="flex: 0.7; text-align: center;">{i["c"]}</span>
-        <span style="flex: 1.3; text-align: right; font-weight: bold;">${i["s"]:,.0f}</span>
+        <span style="flex: 1.8; word-break: break-word;">{i["d"]}</span>
+        <span style="flex: 0.5; text-align: center;">{i["c"]}</span>
+        <span style="flex: 0.9; text-align: right;">${i["p"]:,.0f}</span>
+        <span style="flex: 1; text-align: right; font-weight: bold;">${i["s"]:,.0f}</span>
     </div>''' 
     for i in st.session_state.lista
 ])
