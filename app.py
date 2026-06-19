@@ -110,18 +110,18 @@ else:
     if 'cantidad_input_val' not in st.session_state: st.session_state.cantidad_input_val = 1
     if 'precio_input_val' not in st.session_state: st.session_state.precio_input_val = 0
 
-    # --- CONTROLADOR DEL MENÚ ---
+    # --- CONTROLADOR DEL MENÚ CORREGIDO ---
     opciones_menu = ["⚡ Creador", "📂 Historial"]
-    if 'pagina_actual' not in st.session_state:
-        st.session_state.pagina_actual = "⚡ Creador"
+    if 'menu_actual' not in st.session_state:
+        st.session_state.menu_actual = "⚡ Creador"
 
-    menu = st.sidebar.radio("Ir a:", opciones_menu, index=opciones_menu.index(st.session_state.pagina_actual))
-    st.session_state.pagina_actual = menu
+    # Vinculamos directamente el radio button al session_state
+    menu = st.sidebar.radio("Ir a:", opciones_menu, key="menu_actual")
 
     # ==========================================
     # PANTALLA: CREADOR
     # ==========================================
-    if st.session_state.pagina_actual == "⚡ Creador":
+    if st.session_state.menu_actual == "⚡ Creador":
         st.title("⚡ Creador de Presupuestos")
         
         if st.session_state.editando_id:
@@ -288,7 +288,7 @@ else:
                     st.session_state.precio_input_val = 0
                     st.rerun()
 
-        # --- PREVISUALIZACIÓN DE LA PLANTILLA CON ALINEACIONES Y ANCHOS CORRECTOS ---
+        # --- PREVISUALIZACIÓN DE LA PLANTILLA ---
         filas = "".join([
             f'''<div style="display:flex; padding:8px 0; border-bottom:1px solid #eee; font-size: 11px; align-items: center;">
                 <span style="flex: 2.3; word-break: break-word; text-align: left;">{i["d"]}</span>
@@ -325,7 +325,7 @@ else:
     # ==========================================
     # PANTALLA: HISTORIAL
     # ==========================================
-    elif st.session_state.pagina_actual == "📂 Historial":
+    elif st.session_state.menu_actual == "📂 Historial":
         st.title("📂 Historial Sincronizado (Google Sheets)")
         
         with st.spinner("Cargando datos desde la nube..."):
@@ -422,7 +422,8 @@ else:
                                             "p": float(it['precio_unitario']) if 'precio_unitario' in df_items.columns else 0.0, 
                                             "s": float(it['subtotal']) if 'subtotal' in df_items.columns else 0.0
                                         })
-                                st.session_state.pagina_actual = "⚡ Creador"
+                                # CORRECCIÓN ACÁ: Forzamos el menú usando el state vinculado al componente
+                                st.session_state.menu_actual = "⚡ Creador"
                                 st.rerun()
                                 
                         with c_del:
