@@ -38,7 +38,7 @@ def login():
         pass_input = st.text_input("Contraseña", type="password", placeholder="Ingresá tu contraseña")
         
         if st.button("🚀 Iniciar Sesión", type="primary"):
-            if user_input == "ElectroM" and pass_input == "ElectroM":
+            if user_input == "ElectroM" and pass_input == "ElectroM_":
                 st.session_state.autenticado = True
                 st.success("¡Acceso concedido!")
                 time.sleep(0.5)
@@ -110,18 +110,22 @@ else:
     if 'cantidad_input_val' not in st.session_state: st.session_state.cantidad_input_val = 1
     if 'precio_input_val' not in st.session_state: st.session_state.precio_input_val = 0
 
-    # --- CONTROLADOR DEL MENÚ CORREGIDO ---
+    # --- NUEVA LÓGICA DE CONTROL DE MENÚ (SIN BUGS) ---
     opciones_menu = ["⚡ Creador", "📂 Historial"]
-    if 'menu_actual' not in st.session_state:
-        st.session_state.menu_actual = "⚡ Creador"
+    if 'pagina_destino' not in st.session_state:
+        st.session_state.pagina_destino = "⚡ Creador"
 
-    # Vinculamos directamente el radio button al session_state
-    menu = st.sidebar.radio("Ir a:", opciones_menu, key="menu_actual")
+    # Buscamos qué pestaña marcar basándonos en la variable de destino
+    idx_defecto = opciones_menu.index(st.session_state.pagina_destino)
+    menu_seleccionado = st.sidebar.radio("Ir a:", opciones_menu, index=idx_defecto)
+    
+    # Almacenamos lo que el usuario cliqueó manualmente
+    st.session_state.pagina_destino = menu_seleccionado
 
     # ==========================================
     # PANTALLA: CREADOR
     # ==========================================
-    if st.session_state.menu_actual == "⚡ Creador":
+    if st.session_state.pagina_destino == "⚡ Creador":
         st.title("⚡ Creador de Presupuestos")
         
         if st.session_state.editando_id:
@@ -325,7 +329,7 @@ else:
     # ==========================================
     # PANTALLA: HISTORIAL
     # ==========================================
-    elif st.session_state.menu_actual == "📂 Historial":
+    elif st.session_state.pagina_destino == "📂 Historial":
         st.title("📂 Historial Sincronizado (Google Sheets)")
         
         with st.spinner("Cargando datos desde la nube..."):
@@ -422,8 +426,8 @@ else:
                                             "p": float(it['precio_unitario']) if 'precio_unitario' in df_items.columns else 0.0, 
                                             "s": float(it['subtotal']) if 'subtotal' in df_items.columns else 0.0
                                         })
-                                # CORRECCIÓN ACÁ: Forzamos el menú usando el state vinculado al componente
-                                st.session_state.menu_actual = "⚡ Creador"
+                                # Modificación limpia mediante variable de redirección no atada a 'key' directos de componentes
+                                st.session_state.pagina_destino = "⚡ Creador"
                                 st.rerun()
                                 
                         with c_del:
