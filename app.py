@@ -38,7 +38,7 @@ def login():
         pass_input = st.text_input("Contraseña", type="password", placeholder="Ingresá tu contraseña")
         
         if st.button("🚀 Iniciar Sesión", type="primary"):
-            if user_input == "ElectroM" and pass_input == "ElectroM_":
+            if user_input == "ElectroM" and pass_input == "ElectroM":
                 st.session_state.autenticado = True
                 st.success("¡Acceso concedido!")
                 time.sleep(0.5)
@@ -204,7 +204,8 @@ else:
                 for index, item in enumerate(st.session_state.lista):
                     col_item, col_btn_edit, col_btn_del = st.columns([0.70, 0.15, 0.15])
                     with col_item:
-                        st.write(f"**{item['d']}** ({item['c']} x ${item['p']:,.0f}) = ${item['s']:,.0f}")
+                        texto_item = f"**{item['d']}** ({item['c']} x ${item['p']:,.0f}) = ${item['s']:,.0f}"
+                        st.write(texto_item.replace(",", "."))
                     with col_btn_edit:
                         if st.button("✏️", key=f"editar_item_{index}"):
                             st.session_state.index_servicio_editando = index
@@ -287,18 +288,19 @@ else:
                     st.session_state.precio_input_val = 0
                     st.rerun()
 
-        # --- PREVISUALIZACIÓN DE LA PLANTILLA ---
+        # --- PREVISUALIZACIÓN DE LA PLANTILLA CON ALINEACIONES Y ANCHOS CORRECTOS ---
         filas = "".join([
             f'''<div style="display:flex; padding:8px 0; border-bottom:1px solid #eee; font-size: 11px; align-items: center;">
-                <span style="flex: 1.8; word-break: break-word;">{i["d"]}</span>
-                <span style="flex: 0.5; text-align: center;">{i["c"]}</span>
-                <span style="flex: 0.9; text-align: right;">${i["p"]:,.0f}</span>
-                <span style="flex: 1; text-align: right; font-weight: bold;">${i["s"]:,.0f}</span>
-            </div>''' 
+                <span style="flex: 2.3; word-break: break-word; text-align: left;">{i["d"]}</span>
+                <span style="flex: 0.4; text-align: center;">{i["c"]}</span>
+                <span style="flex: 0.7; text-align: right;">${i["p"]:,.0f}</span>
+                <span style="flex: 0.8; text-align: right; font-weight: bold;">${i["s"]:,.0f}</span>
+            </div>'''.replace(",", ".") 
             for i in st.session_state.lista
         ])
 
         total = sum(i['s'] for i in st.session_state.lista)
+        total_formateado = f"${total:,.0f}".replace(",", ".")
 
         encabezado_html = ""
         if os.path.exists("encabezado.jpg"):
@@ -314,7 +316,7 @@ else:
             with open("plantilla.html", "r", encoding="utf-8") as f:
                 html = f.read().replace("__ENCABEZADO__", encabezado_html).replace("__CLIENTE__", cliente)\
                     .replace("__DIRECCION__", dir).replace("__FECHA__", fecha)\
-                    .replace("__TABLA__", filas).replace("__TOTAL__", f"${total:,.0f}")\
+                    .replace("__TABLA__", filas).replace("__TOTAL__", total_formateado)\
                     .replace("__DETALLE__", detalle).replace("__PIE__", pie_html)
             
             with col2:
@@ -352,7 +354,6 @@ else:
                 p_obs = str(row['observaciones']) if pd.notna(row['observaciones']) else ""
                 p_estado = str(row['estado']) if pd.notna(row['estado']) else "⏳ Pendiente"
                 
-                # --- PARCHE DE LIMPIEZA PARA EL TELÉFONO (.0) ---
                 p_tel = ""
                 if 'telefono' in row and pd.notna(row['telefono']):
                     p_tel = str(row['telefono']).strip()
@@ -367,12 +368,15 @@ else:
                     
                     with col_info:
                         color_estado = "orange" if "Pendiente" in p_estado else ("green" if "Aprobado" in p_estado else "blue")
-                        st.write(f"### 👤 {p_cliente} — Total: **${p_total:,.0f}**")
+                        
+                        texto_titulo = f"### {p_cliente} — Total: **${p_total:,.0f}**"
+                        st.write(texto_titulo.replace(",", "."))
+                        
                         st.markdown(f"**Estado:** :{color_estado}[**{p_estado}**]")
                         
-                        info_contacto = f"📅 **Fecha:** {p_fecha}"
-                        if p_dir: info_contacto += f" | 📍 **Dirección:** {p_dir}"
-                        if p_tel: info_contacto += f" | 📞 **Teléfono:** {p_tel}"
+                        info_contacto = f"**Fecha:** {p_fecha}"
+                        if p_dir: info_contacto += f"  |  **Dirección:** {p_dir}"
+                        if p_tel: info_contacto += f"  |  **Teléfono:** {p_tel}"
                         st.write(info_contacto)
                         
                         if p_obs:
