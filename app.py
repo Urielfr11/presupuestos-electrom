@@ -68,10 +68,14 @@ else:
             df_p = pd.read_csv(url_p)
             df_i = pd.read_csv(url_i)
             
+            # Limpieza profunda de nombres de columnas (quita espacios invisibles y pasa a minúsculas)
             if not df_p.empty:
-                df_p.columns = [str(c).strip().lower() for c in df_p.columns]
+                df_p.columns = df_p.columns.str.strip().str.lower()
+                mapeo_columnas = {'teléfono': 'telefono', 'tel': 'telefono', 'whatsapp': 'telefono'}
+                df_p = df_p.rename(columns=mapeo_columnas)
+                
             if not df_i.empty:
-                df_i.columns = [str(c).strip().lower() for c in df_i.columns]
+                df_i.columns = df_i.columns.str.strip().str.lower()
 
             df_p = df_p.dropna(how="all")
             df_i = df_i.dropna(how="all")
@@ -115,7 +119,6 @@ else:
     if 'pagina_destino' not in st.session_state:
         st.session_state.pagina_destino = "⚡ Creador"
 
-    # Sincroniza la variable intermedia usando el callback nativo
     def cambiar_menu():
         st.session_state.pagina_destino = st.session_state.menu_sidebar
 
@@ -166,7 +169,6 @@ else:
             
             d = st.text_input("Servicio", value=st.session_state.servicio_input_val)
             
-            # Casteo forzado a int para evitar StreamlitMixedNumericTypesError
             c = st.number_input("Cantidad", min_value=1, value=int(st.session_state.cantidad_input_val), step=1)
             p = st.number_input("Precio Unitario ($)", min_value=0, value=int(st.session_state.precio_input_val), step=1)
             
@@ -360,12 +362,15 @@ else:
                 p_obs = str(row['observaciones']) if pd.notna(row['observaciones']) else ""
                 p_estado = str(row['estado']) if pd.notna(row['estado']) else "⏳ Pendiente"
                 
+                # Procesamiento seguro y robusto para la extracción de números de teléfono
                 p_tel = ""
                 if 'telefono' in row and pd.notna(row['telefono']):
-                    p_tel = str(row['telefono']).strip()
-                    if p_tel.endswith('.0'):
-                        p_tel = p_tel[:-2]
-                
+                    val_tel = str(row['telefono']).strip()
+                    if val_tel != "" and val_tel.lower() != "nan":
+                        if val_tel.endswith('.0'):
+                            val_tel = val_tel[:-2]
+                        p_tel = val_tel
+
                 if filtro_estado != "Todos" and p_estado != filtro_estado:
                     continue
 
@@ -380,10 +385,14 @@ else:
                         
                         st.markdown(f"**Estado:** :{color_estado}[**{p_estado}**]")
                         
-                        info_contacto = f"**Fecha:** {p_fecha}"
-                        if p_dir: info_contacto += f"  |  **Dirección:** {p_dir}"
-                        if p_tel: info_contacto += f"  |  **Teléfono:** {p_tel}"
-                        st.write(info_contacto)
+                        # Construcción dinámica de la metadata para evitar strings rotos o vacíos
+                        info_linea = f"**Fecha:** {p_fecha}"
+                        if p_dir:
+                            info_linea += f"  |  **Dirección:** {p_dir}"
+                        if p_tel:
+                            info_linea += f"  |  **Teléfono:** {p_tel}"
+                            
+                        st.write(info_linea)
                         
                         if p_obs:
                             st.text(f"📝 Obs: {p_obs}")
