@@ -110,17 +110,17 @@ else:
     if 'cantidad_input_val' not in st.session_state: st.session_state.cantidad_input_val = 1
     if 'precio_input_val' not in st.session_state: st.session_state.precio_input_val = 0
 
-    # --- NUEVA LÓGICA DE CONTROL DE MENÚ (SIN BUGS) ---
+    # --- CONTROL TOTAL DEL MENÚ LATERAL ---
     opciones_menu = ["⚡ Creador", "📂 Historial"]
     if 'pagina_destino' not in st.session_state:
         st.session_state.pagina_destino = "⚡ Creador"
 
-    # Buscamos qué pestaña marcar basándonos en la variable de destino
+    # Sincroniza la variable intermedia usando el callback nativo
+    def cambiar_menu():
+        st.session_state.pagina_destino = st.session_state.menu_sidebar
+
     idx_defecto = opciones_menu.index(st.session_state.pagina_destino)
-    menu_seleccionado = st.sidebar.radio("Ir a:", opciones_menu, index=idx_defecto)
-    
-    # Almacenamos lo que el usuario cliqueó manualmente
-    st.session_state.pagina_destino = menu_seleccionado
+    st.sidebar.radio("Ir a:", opciones_menu, index=idx_defecto, key="menu_sidebar", on_change=cambiar_menu)
 
     # ==========================================
     # PANTALLA: CREADOR
@@ -165,8 +165,10 @@ else:
                 st.info(f"✍️ Editando servicio en la lista (Ítem {st.session_state.index_servicio_editando + 1})")
             
             d = st.text_input("Servicio", value=st.session_state.servicio_input_val)
-            c = st.number_input("Cantidad", min_value=1, value=st.session_state.cantidad_input_val)
-            p = st.number_input("Precio Unitario ($)", min_value=0, value=st.session_state.precio_input_val)
+            
+            # Casteo forzado a int para evitar StreamlitMixedNumericTypesError
+            c = st.number_input("Cantidad", min_value=1, value=int(st.session_state.cantidad_input_val), step=1)
+            p = st.number_input("Precio Unitario ($)", min_value=0, value=int(st.session_state.precio_input_val), step=1)
             
             st.session_state.servicio_input_val = d
             st.session_state.cantidad_input_val = c
@@ -426,7 +428,6 @@ else:
                                             "p": float(it['precio_unitario']) if 'precio_unitario' in df_items.columns else 0.0, 
                                             "s": float(it['subtotal']) if 'subtotal' in df_items.columns else 0.0
                                         })
-                                # Modificación limpia mediante variable de redirección no atada a 'key' directos de componentes
                                 st.session_state.pagina_destino = "⚡ Creador"
                                 st.rerun()
                                 
